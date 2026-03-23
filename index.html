@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Mia Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header con Orologio -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Bentornato! 👋</h1>
+                <p class="text-gray-500" id="current-date"></p>
+            </div>
+            <div class="glass-card px-6 py-3 text-2xl font-mono font-bold text-blue-600" id="clock">
+                00:00:00
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Sezione Link Rapidi -->
+            <section class="md:col-span-2 glass-card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Link Preferiti</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <a href="https://www.google.it" target="_blank" class="flex flex-col items-center p-4 hover:bg-blue-50 rounded-xl transition-colors">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                            <img src="https://www.google.com/favicon.ico" class="w-6 h-6" alt="Google">
+                        </div>
+                        <span class="text-sm font-medium">Google</span>
+                    </a>
+                    <a href="https://www.youtube.com" target="_blank" class="flex flex-col items-center p-4 hover:bg-red-50 rounded-xl transition-colors">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                            <img src="https://www.youtube.com/favicon.ico" class="w-6 h-6" alt="YouTube">
+                        </div>
+                        <span class="text-sm font-medium">YouTube</span>
+                    </a>
+                    <a href="https://github.com" target="_blank" class="flex flex-col items-center p-4 hover:bg-gray-100 rounded-xl transition-colors">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                            <img src="https://github.com/favicon.ico" class="w-6 h-6" alt="GitHub">
+                        </div>
+                        <span class="text-sm font-medium">GitHub</span>
+                    </a>
+                    <a href="https://www.notion.so" target="_blank" class="flex flex-col items-center p-4 hover:bg-gray-50 rounded-xl transition-colors">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
+                            <img src="https://www.notion.so/favicon.ico" class="w-6 h-6" alt="Notion">
+                        </div>
+                        <span class="text-sm font-medium">Notion</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Sezione Note Veloci -->
+            <section class="glass-card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Note Veloci</h2>
+                <textarea 
+                    id="quick-notes" 
+                    class="w-full h-40 p-3 bg-yellow-50 border-none rounded-lg focus:ring-2 focus:ring-yellow-200 resize-none text-gray-700"
+                    placeholder="Scrivi qualcosa qui... viene salvato automaticamente!"></textarea>
+            </section>
+
+            <!-- Sezione Meteo (Simulazione) -->
+            <section class="glass-card p-6 flex flex-col items-center justify-center text-center">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2 uppercase tracking-wider">Meteo Località</h2>
+                <div class="text-5xl mb-2">☀️</div>
+                <div class="text-4xl font-bold text-gray-800">22°C</div>
+                <p class="text-gray-500">Cielo Sereno</p>
+            </section>
+
+            <!-- Lista Cose da Fare -->
+            <section class="md:col-span-2 glass-card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">To-Do List</h2>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="todo-input" class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Aggiungi impegno...">
+                    <button onclick="addTodo()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">Aggiungi</button>
+                </div>
+                <ul id="todo-list" class="space-y-2">
+                    <!-- Gli elementi verranno aggiunti qui via JS -->
+                </ul>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Orologio e Data
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('it-IT');
+            const dateStr = now.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('clock').textContent = timeStr;
+            document.getElementById('current-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Gestione Note
+        const notesArea = document.getElementById('quick-notes');
+        notesArea.value = localStorage.getItem('my-dashboard-notes') || '';
+        notesArea.addEventListener('input', () => {
+            localStorage.setItem('my-dashboard-notes', notesArea.value);
+        });
+
+        // Gestione To-Do
+        let todos = JSON.parse(localStorage.getItem('my-dashboard-todos')) || [];
+        
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-3 bg-white rounded-lg border';
+                li.innerHTML = `
+                    <span class="${todo.done ? 'line-through text-gray-400' : ''}">${todo.text}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleTodo(${index})" class="text-green-500 hover:text-green-700">✓</button>
+                        <button onclick="deleteTodo(${index})" class="text-red-500 hover:text-red-700">✕</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            localStorage.setItem('my-dashboard-todos', JSON.stringify(todos));
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            if (input.value.trim() !== '') {
+                todos.push({ text: input.value, done: false });
+                input.value = '';
+                renderTodos();
+            }
+        }
+
+        function toggleTodo(index) {
+            todos[index].done = !todos[index].done;
+            renderTodos();
+        }
+
+        function deleteTodo(index) {
+            todos.splice(index, 1);
+            renderTodos();
+        }
+
+        renderTodos();
+    </script>
+</body>
+</html>
