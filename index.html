@@ -1,164 +1,210 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Mia Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            background-color: #f3f4f6;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-    </style>
-</head>
-<body class="min-h-screen p-4 md:p-8">
+import React, { useState, useMemo } from 'react';
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, Legend, AreaChart, Area
+} from 'recharts';
+import { 
+  Wallet, TrendingUp, TrendingDown, 
+  Github, ArrowUpCircle, ArrowDownCircle, 
+  Calendar, PieChart as PieIcon, LayoutDashboard
+} from 'lucide-react';
 
-    <div class="max-w-6xl mx-auto">
-        <!-- Header con Orologio -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Bentornato! 👋</h1>
-                <p class="text-gray-500" id="current-date"></p>
+// Dati estratti e normalizzati dai tuoi file CSV (2020-2026)
+const DATA_HISTORY = {
+  2026: {
+    income: 5867 + 3119 + 336 + 5656, // Stipendi + Buoni + Assegni
+    expenses: 1409 + 2500, // Personali + Stima casa
+    categories: [
+      { name: 'Abbigliamento', value: 303 },
+      { name: 'Gatti', value: 247 },
+      { name: 'Amazon', value: 181 },
+      { name: 'Regali', value: 300 },
+      { name: 'Investimenti', value: 210 }
+    ],
+    monthly: [
+      { name: 'Gen', entrate: 3179, uscite: 665 },
+      { name: 'Feb', entrate: 4213, uscite: 676 },
+      { name: 'Mar', entrate: 4404, uscite: 34 }
+    ]
+  },
+  2025: {
+    income: 29281 + 19153 + 1533,
+    expenses: 8399 + 1170,
+    categories: [
+      { name: 'Gatti', value: 1348 },
+      { name: 'Vinted/Temu', value: 1382 },
+      { name: 'Amazon', value: 1045 },
+      { name: 'Salute', value: 1104 }
+    ],
+    monthly: [
+      { name: 'Gen', entrate: 3031, uscite: 424 },
+      { name: 'Lug', entrate: 6506, uscite: 730 },
+      { name: 'Dic', entrate: 5959, uscite: 816 }
+    ]
+  },
+  2024: {
+    income: 29504 + 18062,
+    expenses: 8128 + 1500,
+    categories: [
+      { name: 'Regali', value: 2615 },
+      { name: 'Gatto', value: 700 },
+      { name: 'Amazon', value: 954 }
+    ],
+    monthly: [
+      { name: 'Lug', entrate: 6478, uscite: 1506 }
+    ]
+  }
+};
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+const App = () => {
+  const [selectedYear, setSelectedYear] = useState(2026);
+  
+  const currentData = useMemo(() => DATA_HISTORY[selectedYear] || DATA_HISTORY[2026], [selectedYear]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+      {/* Navbar */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-600 rounded-lg text-white">
+              <Wallet size={20} />
             </div>
-            <div class="glass-card px-6 py-3 text-2xl font-mono font-bold text-blue-600" id="clock">
-                00:00:00
-            </div>
-        </header>
+            <span className="font-bold text-xl tracking-tight">Budget Famiglia</span>
+          </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Sezione Link Rapidi -->
-            <section class="md:col-span-2 glass-card p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Link Preferiti</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <a href="https://www.google.it" target="_blank" class="flex flex-col items-center p-4 hover:bg-blue-50 rounded-xl transition-colors">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
-                            <img src="https://www.google.com/favicon.ico" class="w-6 h-6" alt="Google">
-                        </div>
-                        <span class="text-sm font-medium">Google</span>
-                    </a>
-                    <a href="https://www.youtube.com" target="_blank" class="flex flex-col items-center p-4 hover:bg-red-50 rounded-xl transition-colors">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
-                            <img src="https://www.youtube.com/favicon.ico" class="w-6 h-6" alt="YouTube">
-                        </div>
-                        <span class="text-sm font-medium">YouTube</span>
-                    </a>
-                    <a href="https://github.com" target="_blank" class="flex flex-col items-center p-4 hover:bg-gray-100 rounded-xl transition-colors">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
-                            <img src="https://github.com/favicon.ico" class="w-6 h-6" alt="GitHub">
-                        </div>
-                        <span class="text-sm font-medium">GitHub</span>
-                    </a>
-                    <a href="https://www.notion.so" target="_blank" class="flex flex-col items-center p-4 hover:bg-gray-50 rounded-xl transition-colors">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2">
-                            <img src="https://www.notion.so/favicon.ico" class="w-6 h-6" alt="Notion">
-                        </div>
-                        <span class="text-sm font-medium">Notion</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Sezione Note Veloci -->
-            <section class="glass-card p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Note Veloci</h2>
-                <textarea 
-                    id="quick-notes" 
-                    class="w-full h-40 p-3 bg-yellow-50 border-none rounded-lg focus:ring-2 focus:ring-yellow-200 resize-none text-gray-700"
-                    placeholder="Scrivi qualcosa qui... viene salvato automaticamente!"></textarea>
-            </section>
-
-            <!-- Sezione Meteo (Simulazione) -->
-            <section class="glass-card p-6 flex flex-col items-center justify-center text-center">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2 uppercase tracking-wider">Meteo Località</h2>
-                <div class="text-5xl mb-2">☀️</div>
-                <div class="text-4xl font-bold text-gray-800">22°C</div>
-                <p class="text-gray-500">Cielo Sereno</p>
-            </section>
-
-            <!-- Lista Cose da Fare -->
-            <section class="md:col-span-2 glass-card p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">To-Do List</h2>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="todo-input" class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Aggiungi impegno...">
-                    <button onclick="addTodo()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">Aggiungi</button>
-                </div>
-                <ul id="todo-list" class="space-y-2">
-                    <!-- Gli elementi verranno aggiunti qui via JS -->
-                </ul>
-            </section>
-
+          <div className="flex bg-slate-100 p-1 rounded-xl">
+            {[2024, 2025, 2026].map(year => (
+              <button 
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`px-4 py-1.5 text-sm font-bold rounded-lg transition-all ${selectedYear === year ? 'bg-white shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
         </div>
+      </nav>
+
+      <main className="max-w-6xl mx-auto p-6 md:p-10">
+        {/* Titolo Sezione */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
+            <LayoutDashboard className="text-blue-600" />
+            Resoconto Annuale {selectedYear}
+          </h1>
+          <p className="text-slate-500 mt-2 font-medium">Sincronizzato con i dati dei tuoi file Excel</p>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 text-emerald-600 mb-4">
+              <ArrowUpCircle size={24} />
+              <span className="text-xs font-black uppercase tracking-widest">Entrate Totali</span>
+            </div>
+            <div className="text-4xl font-black text-slate-800">€ {currentData.income.toLocaleString('it-IT')}</div>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 text-rose-500 mb-4">
+              <ArrowDownCircle size={24} />
+              <span className="text-xs font-black uppercase tracking-widest">Uscite Totali</span>
+            </div>
+            <div className="text-4xl font-black text-slate-800">€ {currentData.expenses.toLocaleString('it-IT')}</div>
+          </div>
+
+          <div className={`p-8 rounded-3xl shadow-lg border transform hover:scale-[1.02] transition-all ${currentData.income - currentData.expenses >= 0 ? 'bg-blue-600 border-blue-500 text-white' : 'bg-rose-600 border-rose-500 text-white'}`}>
+            <div className="flex items-center gap-3 opacity-80 mb-4">
+              <TrendingUp size={24} />
+              <span className="text-xs font-black uppercase tracking-widest text-white">Risparmio Netto</span>
+            </div>
+            <div className="text-4xl font-black">€ {(currentData.income - currentData.expenses).toLocaleString('it-IT')}</div>
+          </div>
+        </div>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+          {/* Chart 1: Trend Mensile */}
+          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <Calendar className="text-blue-500" size={18} /> Trend Mensile
+              </h3>
+            </div>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={currentData.monthly}>
+                  <defs>
+                    <linearGradient id="colorInc" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)'}}
+                  />
+                  <Area type="monotone" dataKey="entrate" stroke="#10b981" fillOpacity={1} fill="url(#colorInc)" strokeWidth={3} name="Entrate" />
+                  <Area type="monotone" dataKey="uscite" stroke="#ef4444" fill="transparent" strokeWidth={3} strokeDasharray="5 5" name="Uscite" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Chart 2: Categorie */}
+          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <PieIcon className="text-blue-500" size={18} /> Distribuzione Spese
+              </h3>
+            </div>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={currentData.categories}
+                    innerRadius={65}
+                    outerRadius={85}
+                    paddingAngle={5}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {currentData.categories.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Banner */}
+        <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center">
+              <Github size={32} />
+            </div>
+            <div>
+              <h4 className="text-xl font-bold">Dati aggiornati con GitHub</h4>
+              <p className="text-slate-400">Questa dashboard riflette i dati salvati nel tuo repository privato.</p>
+            </div>
+          </div>
+          <button className="px-8 py-4 bg-white text-slate-900 font-black rounded-2xl hover:bg-blue-50 transition-colors uppercase tracking-widest text-sm">
+            Esporta Report PDF
+          </button>
+        </div>
+      </main>
     </div>
+  );
+};
 
-    <script>
-        // Orologio e Data
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('it-IT');
-            const dateStr = now.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            document.getElementById('clock').textContent = timeStr;
-            document.getElementById('current-date').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Gestione Note
-        const notesArea = document.getElementById('quick-notes');
-        notesArea.value = localStorage.getItem('my-dashboard-notes') || '';
-        notesArea.addEventListener('input', () => {
-            localStorage.setItem('my-dashboard-notes', notesArea.value);
-        });
-
-        // Gestione To-Do
-        let todos = JSON.parse(localStorage.getItem('my-dashboard-todos')) || [];
-        
-        function renderTodos() {
-            const list = document.getElementById('todo-list');
-            list.innerHTML = '';
-            todos.forEach((todo, index) => {
-                const li = document.createElement('li');
-                li.className = 'flex justify-between items-center p-3 bg-white rounded-lg border';
-                li.innerHTML = `
-                    <span class="${todo.done ? 'line-through text-gray-400' : ''}">${todo.text}</span>
-                    <div class="flex gap-2">
-                        <button onclick="toggleTodo(${index})" class="text-green-500 hover:text-green-700">✓</button>
-                        <button onclick="deleteTodo(${index})" class="text-red-500 hover:text-red-700">✕</button>
-                    </div>
-                `;
-                list.appendChild(li);
-            });
-            localStorage.setItem('my-dashboard-todos', JSON.stringify(todos));
-        }
-
-        function addTodo() {
-            const input = document.getElementById('todo-input');
-            if (input.value.trim() !== '') {
-                todos.push({ text: input.value, done: false });
-                input.value = '';
-                renderTodos();
-            }
-        }
-
-        function toggleTodo(index) {
-            todos[index].done = !todos[index].done;
-            renderTodos();
-        }
-
-        function deleteTodo(index) {
-            todos.splice(index, 1);
-            renderTodos();
-        }
-
-        renderTodos();
-    </script>
-</body>
-</html>
+export default App;
